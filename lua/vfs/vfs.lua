@@ -60,7 +60,7 @@ include ("filesystem/mountedfile.lua")
 include ("filesystem/mountedfolder.lua")
 include ("filesystem/mountedfilestream.lua")
 
-if CLIENT then
+if CLIENT and GetConVar("is_gcompute_user"):GetBool() then
 	include ("filetypes.lua")
 	include ("filetype.lua")
 	include ("filetypes/adv_duplicator.lua")
@@ -94,7 +94,7 @@ include ("protocol/noderenameresponse.lua")
 include ("protocol/endpoint.lua")
 include ("protocol/endpointmanager.lua")
 
-if CLIENT then
+if CLIENT and GetConVar("is_gcompute_user"):GetBool() then
 	VFS.IncludeDirectory ("vfs/ui")
 end
 	
