@@ -158,7 +158,7 @@ include ("protocol/permissionblock/ownerchangerequest.lua")
 include ("protocol/permissionblock/ownerchangeresponse.lua")
 
 if CLIENT then
-	GAuth.IncludeDirectory ("gauth/ui")
+	GAuth.IncludeDirectoryAsync ("gauth/ui")
 end
 
 GAuth.Groups = GAuth.GroupTree ()

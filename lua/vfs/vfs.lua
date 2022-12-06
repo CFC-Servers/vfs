@@ -95,7 +95,7 @@ include ("protocol/endpoint.lua")
 include ("protocol/endpointmanager.lua")
 
 if CLIENT and GetConVar("is_gcompute_user"):GetBool() then
-	VFS.IncludeDirectory ("vfs/ui")
+	VFS.IncludeDirectoryAsync ("vfs/ui")
 end
 	
 -- include ("adaptors/adv_duplicator.lua")
@@ -185,8 +185,8 @@ VFS.Root:ClearPredictedFlag ()
 VFS.PermissionSaver:Load ()
 VFS.PermissionSaver:HookNodeRecursive (VFS.Root)
 
-VFS.IncludeDirectory ("vfs/folders")
-VFS.IncludeDirectory ("vfs/folders/" .. (SERVER and "server" or "client"))
+VFS.IncludeDirectoryAsync ("vfs/folders")
+VFS.IncludeDirectoryAsync ("vfs/folders/" .. (SERVER and "server" or "client"))
 
 -- Events
 VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
