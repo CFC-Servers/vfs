@@ -63,12 +63,6 @@ include ("filesystem/mountedfilestream.lua")
 if CLIENT and GetConVar("is_gcompute_user"):GetBool() then
 	include ("filetypes.lua")
 	include ("filetype.lua")
-	include ("filetypes/adv_duplicator.lua")
-	include ("filetypes/cpuchip.lua")
-	include ("filetypes/expression2.lua")
-	include ("filetypes/gpuchip.lua")
-	include ("filetypes/spuchip.lua")
-	include ("filetypes/starfall.lua")
 end
 
 -- Networking
@@ -97,11 +91,6 @@ include ("protocol/endpointmanager.lua")
 if CLIENT and GetConVar("is_gcompute_user"):GetBool() then
 	VFS.IncludeDirectoryAsync ("vfs/ui")
 end
-	
--- include ("adaptors/adv_duplicator.lua")
--- include ("adaptors/expression2_editor.lua")
--- include ("adaptors/expression2_files.lua")
--- include ("adaptors/expression2_upload.lua")
 
 VFS.AddReloadCommand ("vfs/vfs.lua", "vfs", "VFS")
 
@@ -224,21 +213,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 			if isLocalPlayer then				
 				local mountPaths =
 				{
-					"data/adv_duplicator",
-					"data/advdupe2",
-					"data/cadmin/client_logs",
-					"data/CPUChip",
-					"data/e2files",
-					"data/Expression2",
-					"data/ExpressionGate",
-					"data/LemonGate",
 					"data/luapad",
-					"data/GPUChip",
-					"data/pac2_outfits",
-					"data/pac3",
-					"data/SPUChip",
-					"data/Starfall",
-					"screenshots"
 				}
 				for _, realPath in ipairs (mountPaths) do
 					VFS.RealRoot:GetChild (GAuth.GetSystemId (), realPath,
