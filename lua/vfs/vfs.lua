@@ -3,6 +3,7 @@ VFS = VFS or {}
 
 if not _G.GLib then
     include ("glib/glib.lua")
+    GLib.Debug ("Loading GLib in VFS")
 end
 
 local t = GLib.LoadTimer ("VFS")
