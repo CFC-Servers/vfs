@@ -1,12 +1,12 @@
 if GAuth then return end
 GAuth = GAuth or {}
 
-local t = GLib.LoadTimer ("GAuth")
-
 if not _G.GLib then
     include ("glib/glib.lua")
-    t.step ("GLib")
+    GLib.Debug ("Loading GLib in GAuth")
 end
+
+local t = GLib.LoadTimer ("GAuth")
 
 if not _G.Gooey then
     include ("gooey/gooey.lua")
