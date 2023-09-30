@@ -1,12 +1,11 @@
 if VFS then return end
 VFS = VFS or {}
 
-local t = GLib.LoadTimer ("VFS")
-
 if not _G.GLib then
     include ("glib/glib.lua")
-    t.step ("Load GLib")
 end
+
+local t = GLib.LoadTimer ("VFS")
 
 if not _G.Gooey then
     include ("gooey/gooey.lua")
