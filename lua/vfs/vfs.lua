@@ -1,16 +1,31 @@
 if VFS then return end
 VFS = VFS or {}
 
-include ("glib/glib.lua")
-include ("gooey/gooey.lua")
-include ("gauth/gauth.lua")
+if not _G.GLib then
+    include ("glib/glib.lua")
+    GLib.Debug ("Loading GLib in VFS")
+end
+
+local t = GLib.LoadTimer ("VFS")
+
+if not _G.Gooey then
+    include ("gooey/gooey.lua")
+    t.step ("Load Gooey")
+end
+
+if not _G.GAuth then
+    include ("gauth/gauth.lua")
+    t.step ("Load GAuth")
+end
 
 GLib.Initialize ("VFS", VFS)
 GLib.AddCSLuaPackSystem ("VFS")
 GLib.AddCSLuaPackFile ("autorun/vfs.lua")
 GLib.AddCSLuaPackFolderRecursive ("vfs")
+t.step ("Init")
 
 VFS.PlayerMonitor = VFS.PlayerMonitor ("VFS")
+t.step ("PlayerMonitor")
 
 include ("clipboard.lua")
 include ("path.lua")
@@ -18,9 +33,11 @@ include ("openflags.lua")
 include ("returncode.lua")
 include ("seektype.lua")
 include ("updateflags.lua")
+t.step ("Step 1")
 
 include ("filesystemwatcher.lua")
 include ("permissionsaver.lua")
+t.step ("Step 2")
 
 -- Resources
 include ("iresource.lua")
@@ -28,6 +45,7 @@ include ("httpresource.lua")
 include ("fileresource.lua")
 include ("iresourcelocator.lua")
 include ("defaultresourcelocator.lua")
+t.step ("Step 3")
 
 include ("filesystem/nodetype.lua")
 include ("filesystem/inode.lua")
@@ -35,40 +53,40 @@ include ("filesystem/ifile.lua")
 include ("filesystem/ifolder.lua")
 include ("filesystem/ifilestream.lua")
 include ("filesystem/memoryfilestream.lua")
+t.step ("Step 4")
 
 -- Real
 include ("filesystem/realnode.lua")
 include ("filesystem/realfile.lua")
 include ("filesystem/realfolder.lua")
 include ("filesystem/realfilestream.lua")
+t.step ("Step 5")
 
 -- Networked
 include ("filesystem/netnode.lua")
 include ("filesystem/netfile.lua")
 include ("filesystem/netfolder.lua")
 include ("filesystem/netfilestream.lua")
+t.step ("Step 6")
 
 -- Virtual
 include ("filesystem/vnode.lua")
 include ("filesystem/vfile.lua")
 include ("filesystem/vfolder.lua")
 include ("filesystem/vfilestream.lua")
+t.step ("Step 7")
 
 -- Mounted
 include ("filesystem/mountednode.lua")
 include ("filesystem/mountedfile.lua")
 include ("filesystem/mountedfolder.lua")
 include ("filesystem/mountedfilestream.lua")
+t.step ("Step 8")
 
-if CLIENT then
+if CLIENT and GetConVar("is_gcompute_user"):GetBool() then
 	include ("filetypes.lua")
 	include ("filetype.lua")
-	include ("filetypes/adv_duplicator.lua")
-	include ("filetypes/cpuchip.lua")
-	include ("filetypes/expression2.lua")
-	include ("filetypes/gpuchip.lua")
-	include ("filetypes/spuchip.lua")
-	include ("filetypes/starfall.lua")
+	t.step ("Filetypes")
 end
 
 -- Networking
@@ -90,20 +108,19 @@ include ("protocol/nodedeletionrequest.lua")
 include ("protocol/nodedeletionresponse.lua")
 include ("protocol/noderenamerequest.lua")
 include ("protocol/noderenameresponse.lua")
+t.step ("Step 9")
 
 include ("protocol/endpoint.lua")
 include ("protocol/endpointmanager.lua")
+t.step ("Step 10")
 
-if CLIENT then
-	VFS.IncludeDirectory ("vfs/ui")
+if CLIENT and GetConVar("is_gcompute_user"):GetBool() then
+	VFS.IncludeDirectoryAsync ("vfs/ui")
 end
-	
--- include ("adaptors/adv_duplicator.lua")
--- include ("adaptors/expression2_editor.lua")
--- include ("adaptors/expression2_files.lua")
--- include ("adaptors/expression2_upload.lua")
+t.step ("Step 11")
 
 VFS.AddReloadCommand ("vfs/vfs.lua", "vfs", "VFS")
+t.step ("Step 12")
 
 function VFS.Debug (message)
 	-- print ("[VFS] " .. message)
@@ -139,6 +156,8 @@ function VFS.SanitizeOpenFlags (openFlags)
 	end
 	return openFlags
 end
+
+t.step ("Step 13")
 
 --[[
 	Server:
@@ -185,8 +204,12 @@ VFS.Root:ClearPredictedFlag ()
 VFS.PermissionSaver:Load ()
 VFS.PermissionSaver:HookNodeRecursive (VFS.Root)
 
-VFS.IncludeDirectory ("vfs/folders")
-VFS.IncludeDirectory ("vfs/folders/" .. (SERVER and "server" or "client"))
+t.step ("Step 14")
+
+VFS.IncludeDirectoryAsync ("vfs/folders")
+VFS.IncludeDirectoryAsync ("vfs/folders/" .. (SERVER and "server" or "client"))
+
+t.step ("Step 15")
 
 -- Events
 VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
@@ -224,21 +247,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 			if isLocalPlayer then				
 				local mountPaths =
 				{
-					"data/adv_duplicator",
-					"data/advdupe2",
-					"data/cadmin/client_logs",
-					"data/CPUChip",
-					"data/e2files",
-					"data/Expression2",
-					"data/ExpressionGate",
-					"data/LemonGate",
 					"data/luapad",
-					"data/GPUChip",
-					"data/pac2_outfits",
-					"data/pac3",
-					"data/SPUChip",
-					"data/Starfall",
-					"screenshots"
 				}
 				for _, realPath in ipairs (mountPaths) do
 					VFS.RealRoot:GetChild (GAuth.GetSystemId (), realPath,
@@ -294,3 +303,5 @@ VFS:AddEventListener ("Unloaded", function ()
 	VFS.PermissionSaver:dtor ()
 	VFS.PlayerMonitor:dtor ()
 end)
+
+t.step ("Step 16")

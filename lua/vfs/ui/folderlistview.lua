@@ -25,6 +25,7 @@ function self:Init ()
 	self.ParentFolderItem = nil
 	
 	self:AddColumn ("Name")
+		:SetWidth (275)
 		:SetComparator (
 			function (a, b)
 				return self.DefaultComparator (a, b)

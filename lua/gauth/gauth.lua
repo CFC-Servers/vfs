@@ -1,17 +1,29 @@
 if GAuth then return end
 GAuth = GAuth or {}
 
-include ("glib/glib.lua")
-include ("gooey/gooey.lua")
+if not _G.GLib then
+    include ("glib/glib.lua")
+    GLib.Debug ("Loading GLib in GAuth")
+end
+
+local t = GLib.LoadTimer ("GAuth")
+
+if not _G.Gooey then
+    include ("gooey/gooey.lua")
+    t.step ("Gooey")
+end
 
 GLib.Initialize ("GAuth", GAuth)
 GLib.AddCSLuaPackSystem ("GAuth")
 GLib.AddCSLuaPackFile ("autorun/gauth.lua")
 GLib.AddCSLuaPackFolderRecursive ("gauth")
+t.step ("Init")
 
 GAuth.PlayerMonitor = GAuth.PlayerMonitor ("GAuth")
+t.step ("PlayerMonitor")
 
 GAuth.AddReloadCommand ("gauth/gauth.lua", "gauth", "GAuth")
+t.step ("ReloadCommand")
 
 function GAuth.Debug (message)
 	-- print ("[GAuth] " .. message)
@@ -96,32 +108,40 @@ end
 		
 ]]
 
+t.step ("Step 1")
+
 include ("access.lua")
 include ("returncode.lua")
+t.step ("Step 2")
 
 include ("grouptreenode.lua")
 include ("group.lua")
 include ("grouptree.lua")
 include ("permissionblock.lua")
 include ("permissiondictionary.lua")
+t.step ("Step 3")
 
 include ("permissionblocknetworkermanager.lua")
 include ("permissionblocknetworker.lua")
 include ("grouptreesaver.lua")
 include ("grouptreesender.lua")
+t.step ("Step 4")
 
 include ("protocol/protocol.lua")
 include ("protocol/endpoint.lua")
 include ("protocol/endpointmanager.lua")
 include ("protocol/session.lua")
+t.step ("Step 5")
 
 include ("protocol/initialsyncrequest.lua")
+t.step ("Step 6")
 
 -- Group Tree Nodes
 include ("protocol/useradditionnotification.lua")
 include ("protocol/userremovalnotification.lua")
 include ("protocol/nodeadditionnotification.lua")
 include ("protocol/noderemovalnotification.lua")
+t.step ("Step 7")
 
 include ("protocol/useradditionrequest.lua")
 include ("protocol/useradditionresponse.lua")
@@ -131,11 +151,13 @@ include ("protocol/nodeadditionrequest.lua")
 include ("protocol/nodeadditionresponse.lua")
 include ("protocol/noderemovalrequest.lua")
 include ("protocol/noderemovalresponse.lua")
+t.step ("Step 8")
 
 -- Permission Blocks
 include ("protocol/permissionblocknotification.lua")
 include ("protocol/permissionblockrequest.lua")
 include ("protocol/permissionblockresponse.lua")
+t.step ("Step 9")
 
 include ("protocol/permissionblock/groupentryadditionnotification.lua")
 include ("protocol/permissionblock/groupentryremovalnotification.lua")
@@ -143,6 +165,7 @@ include ("protocol/permissionblock/grouppermissionchangenotification.lua")
 include ("protocol/permissionblock/inheritownerchangenotification.lua")
 include ("protocol/permissionblock/inheritpermissionschangenotification.lua")
 include ("protocol/permissionblock/ownerchangenotification.lua")
+t.step ("Step 10")
 
 include ("protocol/permissionblock/groupentryadditionrequest.lua")
 include ("protocol/permissionblock/groupentryadditionresponse.lua")
@@ -156,9 +179,11 @@ include ("protocol/permissionblock/inheritpermissionschangerequest.lua")
 include ("protocol/permissionblock/inheritpermissionschangeresponse.lua")
 include ("protocol/permissionblock/ownerchangerequest.lua")
 include ("protocol/permissionblock/ownerchangeresponse.lua")
+t.step ("Step 11")
 
 if CLIENT then
-	GAuth.IncludeDirectory ("gauth/ui")
+	GAuth.IncludeDirectoryAsync ("gauth/ui", false, 0.1)
+	t.step ("gauth/ui async")
 end
 
 GAuth.Groups = GAuth.GroupTree ()
@@ -170,6 +195,8 @@ GAuth.GroupTreeSender:HookNode (GAuth.Groups)
 
 GAuth.Groups:MarkPredicted ()
 
+t.step ("Step 12")
+
 -- Set up permission dictionary
 local permissionDictionary = GAuth.PermissionDictionary ()
 permissionDictionary:AddPermission ("Create Group")
@@ -178,6 +205,7 @@ permissionDictionary:AddPermission ("Delete")
 permissionDictionary:AddPermission ("Add User")
 permissionDictionary:AddPermission ("Remove User")
 GAuth.Groups:GetPermissionBlock ():SetPermissionDictionary (permissionDictionary)
+t.step ("Step 13")
 
 -- Set up root permissions
 GAuth.Groups:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Owner", "Modify Permissions", GAuth.Access.Allow)
@@ -187,6 +215,7 @@ GAuth.Groups:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Ow
 GAuth.Groups:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Owner", "Delete", GAuth.Access.Allow)
 GAuth.Groups:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Owner", "Add User", GAuth.Access.Allow)
 GAuth.Groups:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Owner", "Remove User", GAuth.Access.Allow)
+t.step ("Step 14")
 
 GAuth.Groups:AddGroup (GAuth.GetSystemId (), "Administrators",
 	function (returnCode, group)
@@ -241,6 +270,7 @@ GAuth.Groups:AddGroup (GAuth.GetSystemId (), "Owner",
 	end
 )
 GAuth.Groups:ClearPredictedFlag ()
+t.step ("Step 15")
 
 if SERVER then
 	GAuth.GroupTreeSaver:HookNodeRecursive (GAuth.Groups)
@@ -325,3 +355,5 @@ GAuth:AddEventListener ("Unloaded", function ()
 	GAuth.GroupTreeSaver:dtor ()
 	GAuth.PlayerMonitor:dtor ()
 end)
+
+t.step ("Step 16")
